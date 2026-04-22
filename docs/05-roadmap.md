@@ -27,28 +27,41 @@ Exit criteria:
 
 ## Phase 1 — Minimum Lovable Product
 
-Goal: deliver one complete homeowner loop that feels genuinely relieving, not merely promising.
+Goal: give the household manager a clear operating picture of the home and a useful first planning tool, not a full automation layer.
+
+Anchor user:
+
+- existing homeowner
+- primary household coordinator
+- mid-30s mother of two
+- already juggling vendors, maintenance cadence, and reminders manually
 
 Candidate MLP outcome:
 
 - user signs up
-- property context is established
-- user adds or confirms one real vendor/service need
-- Housemate sends or manages one useful reminder, follow-up, or coordination thread
-- user feels Housemate reduced real cognitive load
+- property context is established for the specific house
+- user loads existing vendors and recurring service cadence
+- Housemate reflects that plan in a calendar view
+- user sets reminders with very low friction
+- user feels immediate relief because the home plan is finally visible and organized
 
 Likely scope:
 
 - onboarding with property context
-- SMS-first interaction
-- a lightweight Home briefing
-- a narrow Inbox / action surface
-- a focused Schedule or coordination flow
+- vendor list creation or import
+- recurring cadence modeling
+- a focused calendar / schedule surface
+- a full shell with selective maturity across Home, Inbox, Schedule, Pros, Property, Payments, and Settings
+- a dedicated Pros surface as part of the main nav
 - basic reminders
-- household memory for one real workflow
+- enough home memory structure to support future automation
+- simple SMS-based edits to the plan of record
 
 Deferred from Phase 1 unless required:
 
+- AI orchestrator
+- deep autonomous coordination
+- inbox complexity
 - broad DAL
 - advanced vendor monetization
 - portfolio management
@@ -56,35 +69,39 @@ Deferred from Phase 1 unless required:
 
 Exit criteria:
 
-- early users complete the loop
-- users return because it helped, not because they were asked to explore
-- the product reliably closes the thread on a narrow set of tasks
+- early users can successfully map their real home plan into the product
+- the calendar view feels meaningfully more useful than their current ad hoc system
+- reminders are easy enough to set that the plan becomes actionable
+- users say some version of "I can finally see it all in one place"
 
 ## Phase 2 — Reliability And Habit Loop
 
-Goal: make the first loop dependable enough to become behavior.
+Goal: make the planning layer dependable enough to become the household manager's default home operating system.
 
 Includes:
 
-- better status surfaces
+- better status and summary surfaces
 - stronger reminder reliability
-- clearer audit trail and activity feed
-- better failure handling
+- better editing and upkeep of cadence and vendors
+- clearer audit trail and activity view
+- cleaner failure handling
 - stronger repeat usage patterns
 - tighter onboarding-to-first-value path
+- lightweight workflow support around overdue, upcoming, and seasonal items
 
 Exit criteria:
 
 - repeat use becomes visible
-- time-to-first-automation or first-useful-outcome falls materially
+- time-to-first-useful-outcome falls materially
 - support burden is understandable and manageable
 
 ## Phase 3 — Deeper Automation And Delegated Access
 
-Goal: add true automation depth once trust and core value are established.
+Goal: add true automation depth once the user already trusts Housemate as the system of record for the home plan.
 
 Includes:
 
+- AI orchestration where it clearly reduces work
 - service connection model
 - DAL consent flow
 - per-site authorization
@@ -100,7 +117,7 @@ Exit criteria:
 
 ## Phase 4 — Vendor Platform And Monetization Layer
 
-Goal: introduce monetization that rides on homeowner trust rather than weakening it.
+Goal: introduce monetization that rides on homeowner trust and the household plan of record rather than weakening either.
 
 Includes:
 
@@ -151,10 +168,12 @@ Exit criteria:
 
 Before opening Linear in earnest, define the first build around Phase 1 and break it into 3-5 concrete workstreams:
 
-- onboarding and property context
-- messaging and follow-through loop
+- onboarding and household / property context
+- vendor import and Pros experience
+- cadence and calendar modeling
 - reminders and status surfaces
-- narrow coordination workflow
+- app shell and selective page maturity
+- SMS command loop
 - baseline analytics and billing
 
 Linear should track execution of those workstreams after the scope line is stable.
@@ -174,10 +193,12 @@ Recommended Linear structure once the Phase 1 scope is approved:
 
 ### Phase 1 Projects
 
-- Onboarding And Property Context
-- Messaging And Follow-Through Loop
+- Product Shell And Selective Maturity
+- Onboarding And Household Context
+- Vendor Import And Pros Experience
+- Cadence And Calendar Modeling
 - Reminders And Status Surfaces
-- Narrow Coordination Workflow
+- SMS Command Loop
 - Billing And Baseline Analytics
 
 ### First Issue Groups

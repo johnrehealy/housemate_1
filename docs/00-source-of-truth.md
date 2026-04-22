@@ -39,6 +39,9 @@ The living Markdown set is:
 - `docs/03-product-scope.md`
 - `docs/04-technical-architecture.md`
 - `docs/05-roadmap.md`
+- `docs/06-phase-1-architecture-guardrails.md`
+- `docs/07-shell-maturity-map.md`
+- `docs/decision-log.md`
 
 These files should be edited first. If a polished `.docx` artifact is still needed later, it should be generated from or manually synced to these Markdown docs, not the other way around.
 

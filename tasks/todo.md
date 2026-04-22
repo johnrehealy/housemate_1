@@ -32,7 +32,7 @@ Planned canonical docs:
 
 ## In Progress
 
-- [ ] Review and refine the new Phase 1 scope before creating Linear work items.
+- [ ] Translate the refined Phase 1 MLP into concrete Linear projects and issues.
 
 ## Done
 
@@ -46,6 +46,10 @@ Planned canonical docs:
 - [x] Created the `housemate_1` GitHub repo scaffold as the new canonical source-of-truth base.
 - [x] Imported the living Markdown docs, task files, palette reference, legacy `.docx` inputs, and helper script into the repo.
 - [x] Updated internal doc paths so the repo is self-contained rather than pointing back to the old local workspace.
+- [x] Refined Phase 1 around planning visibility for the primary household manager rather than AI orchestration.
+- [x] Added Phase 1 architecture guardrails to protect durable domain modeling while keeping product scope narrow.
+- [x] Added a shell maturity map so the full Housemate frame can ship in Phase 1 with selective depth by page.
+- [x] Added a canonical decision log and first ADR set for key product and architecture decisions.
 
 ## Session Review
 
@@ -60,3 +64,11 @@ We established a canonical Markdown product brain under `docs/` and updated `CLA
 GitHub move summary:
 
 The empty `housemate_1` repo is now scaffolded as a clean docs-first source-of-truth base. The canonical docs, working task files, palette reference, legacy source `.docx` files, and migration helper script were copied in and repointed so the repo can stand on its own. The old local `Documents/.../CLAUDE/Housemate` workspace is now a secondary copy, not the primary truth.
+
+Phase 1 refinement summary:
+
+The MLP is now explicitly defined for the real first user: the household manager who already carries the coordination load. The first value is not AI orchestration; it is relief through visibility. The user signs up, loads existing vendors and maintenance cadence, sees the full plan for the specific house in a calendar view, and can set reminders easily. This reframes Housemate's first job from "automate the home" to "become the clean system of record for how this home runs."
+
+Planning maturity summary:
+
+The repo now captures the planning nuance we were missing: Phase 1 should ship the full Housemate shell, but not every page should be equally mature. We also now have explicit architecture guardrails and a real decision log so future design and build work can move faster without rediscovering why foundational choices were made.
