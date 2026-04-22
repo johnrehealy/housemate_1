@@ -1,0 +1,11 @@
+.DS_Store
+
+# Editors
+.claude/
+
+# macOS
+Icon?
+
+# Python
+__pycache__/
+*.pyc

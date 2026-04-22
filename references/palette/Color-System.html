@@ -1,0 +1,1603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Housemate — Color System · Ember Signal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Brand scale — five stops */
+    --sunset-vivid:   #FF4E7D;
+    --sunset-subtle:  #F03B65;
+    --sunset-primary: #E8305A;
+    --sunset-hover:   #CC2848;
+    --sunset-warm:    #FF7040;
+
+    --on-sunset: #FFFFFF;
+    --sunset-tint: rgba(232,48,90,0.08);
+
+    /* Agent gradient */
+    --agent-from: #FF4E7D;
+    --agent-to:   #FF7040;
+    --agent-glow1: rgba(255,78,125,0.30);
+    --agent-glow2: rgba(255,112,64,0.20);
+
+    /* Neutrals — warm-tinted, tied to sunset hue family (~20°) */
+    --bg:           #FAF8F7;
+    --card:         #FFFDFC;
+    --border:       #ECE8E6;
+    --fg:           #1A1614;
+    --fg-muted:     #8A8380;
+    --fg-tertiary:  #B8B0AD;
+
+    /* Dusk — warm near-blacks, same hue family */
+    --d-page:      #161214;
+    --d-card:      #1F1B1D;
+    --d-elevated: #262123;
+    --d-border:   #2A2528;
+
+    /* Semantic */
+    --success: #1A7F4B;
+    --info:    #1A5FAF;
+    --warning: #9A6200;
+    --error:   #C0392B;
+    --violet:  #6B46C1;
+
+    --radius: 14px;
+    --radius-sm: 8px;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Layout ---------------------------------------------------- */
+  .page {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 56px 48px 120px;
+  }
+
+  header.doc-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .crumbs {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .crumbs .sep { color: var(--fg-tertiary); }
+  .crumbs .here { color: var(--fg); }
+
+  h1.doc-title {
+    font-size: 56px;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    margin: 0;
+  }
+  .doc-sub {
+    margin: 14px 0 0;
+    max-width: 560px;
+    color: var(--fg-muted);
+    font-size: 16px;
+  }
+  .doc-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-align: right;
+    line-height: 1.9;
+  }
+  .doc-meta b { color: var(--fg); font-weight: 600; }
+  .doc-meta .dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 999px;
+    background: var(--sunset-primary); margin-right: 6px; vertical-align: 1px;
+  }
+
+  section + section { margin-top: 72px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--fg-tertiary);
+    text-transform: uppercase;
+  }
+  .sec-head h2 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .sec-head .rule {
+    flex: 1; height: 1px; background: var(--border);
+    align-self: center;
+  }
+  .sec-note {
+    color: var(--fg-muted);
+    font-size: 13px;
+    max-width: 680px;
+    margin: -8px 0 28px;
+  }
+
+  /* Five-stop scale ------------------------------------------- */
+  .scale {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+  }
+  .stop {
+    padding: 0;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+  .stop:last-child { border-right: none; }
+  .stop .swatch {
+    height: 200px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+  }
+  .stop .swatch .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--on-sunset);
+    opacity: 0.55;
+  }
+  .stop .body {
+    padding: 18px 18px 20px;
+    border-top: 1px solid var(--border);
+    flex: 1;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .stop .name {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .stop .hex {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+  .stop .role {
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+  .stop .where {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    font-size: 11px;
+    color: var(--fg-muted);
+    font-family: var(--mono);
+    line-height: 1.6;
+  }
+
+  /* Gradient block -------------------------------------------- */
+  .grad-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+  }
+  .grad-main {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    overflow: hidden;
+  }
+  .grad-band {
+    height: 180px;
+    background: linear-gradient(90deg, var(--agent-from), var(--agent-to));
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+  }
+  .grad-band .stop-chip {
+    background: rgba(24,22,26,0.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--on-sunset);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+  }
+  .grad-meta {
+    padding: 18px 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    font-size: 12px;
+  }
+  .grad-meta .k {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--fg-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .grad-meta .v {
+    font-family: var(--mono);
+    color: var(--fg);
+  }
+  .grad-side {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .grad-side h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .usage-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .usage-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg);
+    padding: 8px 10px;
+    background: var(--sunset-tint);
+    border-radius: var(--radius-sm);
+  }
+  .usage-list li .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--sunset-hover);
+    background: rgba(232,48,90,0.10);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Neutrals ---------------------------------------------------*/
+  .neutrals {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+  .n-cell {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--card);
+  }
+  .n-cell .chip {
+    height: 92px;
+    border-bottom: 1px solid var(--border);
+  }
+  .n-cell .body {
+    padding: 12px 14px 14px;
+  }
+  .n-cell .hex {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .n-cell .role {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* Dark-mode block ------------------------------------------- */
+  .dark-card {
+    background: var(--d-page);
+    border-radius: var(--radius);
+    padding: 28px;
+    color: #F0EDEB;
+    border: 1px solid var(--d-border);
+  }
+  .dark-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px;
+  }
+  .dark-head .title {
+    font-size: 14px; font-weight: 600;
+  }
+  .dark-head .sub {
+    font-family: var(--mono); font-size: 11px; color: #8A8380;
+  }
+  .shift-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .shift {
+    background: var(--d-card);
+    border: 1px solid var(--d-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .shift .row {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 11px;
+  }
+  .shift .row + .row { margin-top: 10px; }
+  .shift .chip {
+    width: 24px; height: 24px; border-radius: 6px; flex: none;
+  }
+  .shift .arrow {
+    color: #8A8380;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .shift .label {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: #D4CFCC;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .dark-surfaces {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 20px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .dark-surfaces > div {
+    padding: 22px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #D4CFCC;
+  }
+
+  /* Semantic ---------------------------------------------------*/
+  .sem-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .sem {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    overflow: hidden;
+  }
+  .sem .bar { height: 6px; }
+  .sem .body { padding: 16px; }
+  .sem .name {
+    font-size: 13px; font-weight: 600; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sem .hex { font-family: var(--mono); font-size: 11px; color: var(--fg-muted); margin-bottom: 10px; }
+  .sem .meaning { font-size: 12px; color: var(--fg); line-height: 1.5; }
+  .sem .where { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); margin-top: 10px; line-height: 1.6; }
+  .sem .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 8px; border-radius: 999px;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .sem .badge .d { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+
+  /* Applied UI ------------------------------------------------ */
+  .applied {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--fg-tertiary);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .card h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--sans); font-size: 13px; font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary { background: var(--sunset-primary); color: var(--on-sunset); }
+  .btn-primary:hover { background: var(--sunset-hover); }
+  .btn-primary:active { background: var(--sunset-warm); transform: translateY(1px); }
+  .btn-primary:focus-visible { outline: 2px solid var(--sunset-subtle); outline-offset: 2px; }
+  .btn-secondary {
+    background: var(--card); border-color: var(--border); color: var(--fg);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-destructive {
+    background: var(--card); color: var(--error); border-color: rgba(180,35,24,0.25);
+  }
+  .btn-ghost {
+    background: var(--sunset-tint); color: var(--sunset-hover);
+  }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* FAB */
+  .fab {
+    width: 64px; height: 64px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--agent-from), var(--agent-to));
+    box-shadow: 0 12px 28px var(--agent-glow1), 0 6px 16px var(--agent-glow2);
+    display: grid; place-items: center;
+    color: var(--on-sunset);
+  }
+  .fab svg { width: 28px; height: 28px; }
+
+  /* Status badges */
+  .sb {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 500;
+    font-family: var(--mono); letter-spacing: 0.02em;
+  }
+  .sb .d { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .sb-success { background: rgba(26,127,75,0.10); color: var(--success); }
+  .sb-info    { background: rgba(26,95,175,0.10); color: var(--info); }
+  .sb-warning { background: rgba(154,98,0,0.10);  color: var(--warning); }
+  .sb-error   { background: rgba(192,57,43,0.10); color: var(--error); }
+  .sb-violet  { background: rgba(107,70,193,0.10); color: var(--violet); }
+
+  /* Agent bubble */
+  .agent-bubble {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .agent-bubble .top {
+    height: 3px;
+    background: linear-gradient(90deg, var(--agent-from), var(--agent-to));
+  }
+  .agent-bubble .body { padding: 14px 16px; font-size: 13px; line-height: 1.55; color: var(--fg); }
+  .agent-bubble .meta {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--fg-muted);
+    font-family: var(--mono);
+  }
+  .agent-avatar {
+    width: 22px; height: 22px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--agent-from), var(--agent-to));
+    display: grid; place-items: center; color: var(--on-sunset);
+  }
+  .agent-avatar svg { width: 12px; height: 12px; }
+
+  /* Progress bar */
+  .pb {
+    height: 8px; border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .pb > i {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--agent-from), var(--agent-to));
+    width: 68%;
+  }
+
+  /* Input */
+  .input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    font-family: var(--sans); font-size: 13px;
+    color: var(--fg);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .input:focus {
+    border-color: var(--sunset-subtle);
+    box-shadow: 0 0 0 3px rgba(240,59,101,0.22);
+  }
+
+  /* Nav pill */
+  .nav {
+    display: inline-flex; gap: 4px; padding: 4px;
+    background: var(--bg); border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .nav-item {
+    padding: 7px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 500; color: var(--fg-muted);
+    cursor: pointer;
+  }
+  .nav-item.active {
+    background: var(--sunset-tint); color: var(--sunset-hover);
+  }
+
+  /* Asset card */
+  .asset {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .asset .cover {
+    height: 100px;
+    background:
+      linear-gradient(135deg, rgba(255,78,125,0.14), rgba(255,112,64,0.08)),
+      repeating-linear-gradient(45deg, #EEEAE8 0 10px, #E5E1DF 10px 20px);
+    position: relative;
+  }
+  .asset .cover .mono {
+    position: absolute; left: 12px; bottom: 10px;
+    font-family: var(--mono); font-size: 10px;
+    color: var(--fg-muted);
+    background: rgba(255,255,255,0.7);
+    padding: 3px 6px; border-radius: 4px;
+  }
+  .asset .meta { padding: 14px 16px; }
+  .asset .title { font-size: 13px; font-weight: 600; }
+  .asset .sub { font-size: 11px; color: var(--fg-muted); margin-top: 2px; font-family: var(--mono); }
+  .asset .chips { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .agent-chip {
+    font-size: 10px; font-family: var(--mono);
+    background: var(--sunset-tint); color: var(--sunset-hover);
+    padding: 3px 8px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .agent-chip .d {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--agent-from), var(--agent-to));
+  }
+  .waterfall-pos {
+    font-size: 10px; font-family: var(--mono);
+    background: var(--sunset-primary); color: var(--on-sunset);
+    padding: 3px 8px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+
+  /* Contrast table */
+  .contrast {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    overflow: hidden;
+  }
+  .contrast .row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 12px;
+  }
+  .contrast .row:last-child { border-bottom: none; }
+  .contrast .row.h {
+    background: var(--bg);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .contrast .cell { padding: 12px 14px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .contrast .cell:last-child { border-right: none; }
+  .contrast .swatch-sm { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); }
+  .contrast .pass { color: var(--success); }
+  .contrast .fail { color: var(--error); }
+
+  /* footer */
+  footer.doc-foot {
+    margin-top: 88px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 11px; color: var(--fg-muted);
+  }
+
+  /* Tweaks panel ---------------------------------------------- */
+  .tweaks {
+    position: fixed;
+    right: 20px; bottom: 20px;
+    width: 300px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+    padding: 16px;
+    font-size: 12px;
+    z-index: 1000;
+    display: none;
+  }
+  .tweaks.open { display: block; }
+  .tweaks .head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .tweaks .head .t {
+    font-weight: 600; font-size: 12px; letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tweaks .head .t .d {
+    width: 8px; height: 8px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--agent-from), var(--agent-to));
+  }
+  .tweaks .group { margin-bottom: 14px; }
+  .tweaks .group:last-child { margin-bottom: 0; }
+  .tweaks label.k {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 10px;
+    color: var(--fg-muted); letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tweaks label.k .v {
+    color: var(--fg); text-transform: none; letter-spacing: 0;
+  }
+  .tweaks input[type=range] {
+    width: 100%;
+    accent-color: var(--sunset-primary);
+  }
+  .tweaks .preset-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+  }
+  .tweaks .preset {
+    aspect-ratio: 1/1;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+  }
+  .tweaks .preset.active {
+    box-shadow: 0 0 0 2px var(--sunset-subtle);
+    border-color: transparent;
+  }
+  .tweaks .mini-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 11px;
+  }
+  .tweaks .mini-row + .mini-row { margin-top: 6px; }
+  .tweaks .sw {
+    width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border);
+  }
+  .tweaks .btn-tweak {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--card); cursor: pointer; color: var(--fg);
+  }
+  .tweaks .btn-tweak:hover { background: var(--bg); }
+  .tweaks-info {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    font-family: var(--mono); font-size: 10px;
+    color: var(--fg-tertiary);
+    line-height: 1.6;
+  }
+
+  /* Dark hero band -------------------------------------------- */
+  .hero {
+    background: var(--d-page);
+    color: #F0EDEB;
+    border-bottom: 1px solid var(--d-border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: -40% -10% auto auto;
+    width: 720px;
+    height: 720px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,78,125,0.28), rgba(255,112,64,0.12) 45%, transparent 70%);
+    filter: blur(12px);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: auto auto -30% -10%;
+    width: 560px;
+    height: 560px;
+    background: radial-gradient(circle at 70% 70%, rgba(255,112,64,0.18), transparent 65%);
+    filter: blur(16px);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 80px 48px 72px;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    align-items: end;
+  }
+  .hero-kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 22px;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .hero-kicker .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #FF4E7D, #FF7040);
+    box-shadow: 0 0 14px rgba(255,78,125,0.6);
+  }
+  .hero h1 {
+    font-family: var(--sans);
+    font-size: 72px;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    margin: 0;
+    color: #FFFFFF;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(95deg, #FF4E7D 0%, #FF7040 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-sub {
+    margin: 18px 0 0;
+    max-width: 540px;
+    font-size: 17px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.66);
+  }
+  .hero-chips {
+    display: flex;
+    gap: 8px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.78);
+    letter-spacing: 0.02em;
+  }
+  .hero-chip .sw {
+    width: 10px; height: 10px;
+    border-radius: 999px;
+  }
+  .hero-gradient-card {
+    width: 340px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #FF4E7D 0%, #FF7040 100%);
+    padding: 22px;
+    box-shadow:
+      0 24px 60px rgba(255,78,125,0.35),
+      0 8px 24px rgba(255,112,64,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-gradient-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(140% 60% at 50% -10%, rgba(255,255,255,0.25), transparent 60%);
+    pointer-events: none;
+  }
+  .hero-gradient-card .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 14px;
+    position: relative; z-index: 1;
+  }
+  .hero-gradient-card .big {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    position: relative; z-index: 1;
+  }
+  .hero-gradient-card .meta-row {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+    position: relative; z-index: 1;
+  }
+
+  /* Responsive ------------------------------------------------ */
+  @media (max-width: 1100px) {
+    .scale { grid-template-columns: repeat(5, 1fr); }
+    .neutrals { grid-template-columns: repeat(3, 1fr); }
+    .sem-grid { grid-template-columns: repeat(3, 1fr); }
+    .shift-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .page { padding: 32px 20px 80px; }
+    h1.doc-title { font-size: 36px; }
+    header.doc-head { grid-template-columns: 1fr; }
+    .doc-meta { text-align: left; }
+    .scale { grid-template-columns: repeat(2, 1fr); }
+    .grad-row { grid-template-columns: 1fr; }
+    .neutrals { grid-template-columns: repeat(2, 1fr); }
+    .sem-grid { grid-template-columns: 1fr 1fr; }
+    .dark-surfaces { grid-template-columns: 1fr 1fr; }
+    .shift-grid { grid-template-columns: 1fr; }
+    .applied > * { grid-column: span 12 !important; }
+    .hero-inner { grid-template-columns: 1fr; padding: 56px 20px 48px; }
+    .hero h1 { font-size: 44px; }
+    .hero-gradient-card { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-kicker"><span class="dot"></span>Ember Signal · Dusk · v1.5</div>
+      <h1>Colour,<br/>with <span class="grad">restraint.</span></h1>
+      <p class="hero-sub">Housemate's sunset palette spends its boldness once, up front. Everything after it is quiet neutral and semantic — so when rose and ember show up, they mean something.</p>
+      <div class="hero-chips">
+        <span class="hero-chip"><span class="sw" style="background:#FF4E7D"></span>#FF4E7D · Sunset Vivid</span>
+        <span class="hero-chip"><span class="sw" style="background:#E8305A"></span>#E8305A · True Primary</span>
+        <span class="hero-chip"><span class="sw" style="background:#FF7040"></span>#FF7040 · Ember Warm</span>
+      </div>
+    </div>
+    <div class="hero-gradient-card">
+      <div class="eyebrow">Agent gradient · 135°</div>
+      <div class="big">One surface per screen. The rose→ember gradient is how the agent announces it is here.</div>
+      <div class="meta-row">
+        <span>#FF4E7D</span>
+        <span>→</span>
+        <span>#FF7040</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page">
+
+  <header class="doc-head">
+    <div>
+      <div class="crumbs">
+        <span>Housemate</span><span class="sep">/</span>
+        <span>Design System</span><span class="sep">/</span>
+        <span class="here">Color</span>
+      </div>
+      <h1 class="doc-title">Color System</h1>
+      <p class="doc-sub">The Housemate palette is anchored on a five-stop sunset scale — rose through ember warm. Each stop has one job. Semantic statuses live outside the brand on purpose — no red-on-red collisions.</p>
+    </div>
+    <div class="doc-meta">
+      <div><span class="dot"></span><b>v1.5</b> &nbsp; Tokens</div>
+      <div>Last edited &nbsp;<b>Apr 18, 2026</b></div>
+      <div>Owner &nbsp;<b>Design</b></div>
+    </div>
+  </header>
+
+  <!-- 01 Brand Scale -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01 / Brand</span>
+      <h2>Five-Stop Sunset Scale</h2>
+      <span class="rule"></span>
+    </div>
+    <p class="sec-note">Each stop has one role. Restraint by default, boldness where it earns attention. Do not mix. Do not use Sunset Vivid or Ember Warm as a button — they are display-only.</p>
+
+    <div class="scale">
+      <div class="stop">
+        <div class="swatch" style="background: var(--sunset-vivid)"><span class="num">01</span></div>
+        <div class="body">
+          <div class="name">Sunset Vivid</div>
+          <div class="hex">#FF4E7D</div>
+          <div class="role">Display / logo / gradient start</div>
+          <div class="where">Logo mark<br/>Gradient start<br/>Hero glow<br/>Never a CTA</div>
+        </div>
+      </div>
+      <div class="stop">
+        <div class="swatch" style="background: var(--sunset-subtle)"><span class="num">02</span></div>
+        <div class="body">
+          <div class="name">Sunset Subtle</div>
+          <div class="hex">#F03B65</div>
+          <div class="role">Focus rings / selected outlines</div>
+          <div class="where">Focus rings<br/>Ring token<br/>Dusk-mode primary</div>
+        </div>
+      </div>
+      <div class="stop">
+        <div class="swatch" style="background: var(--sunset-primary)"><span class="num">03</span></div>
+        <div class="body">
+          <div class="name">True Primary</div>
+          <div class="hex">#E8305A</div>
+          <div class="role">Buttons / links / active nav</div>
+          <div class="where">Primary btn bg<br/>Active nav<br/>Unread dot<br/>Position badge</div>
+        </div>
+      </div>
+      <div class="stop">
+        <div class="swatch" style="background: var(--sunset-hover)"><span class="num">04</span></div>
+        <div class="body">
+          <div class="name">Primary Hover</div>
+          <div class="hex">#CC2848</div>
+          <div class="role">Hover on primary actions</div>
+          <div class="where">Button hover<br/>Nothing else</div>
+        </div>
+      </div>
+      <div class="stop">
+        <div class="swatch" style="background: var(--sunset-warm)"><span class="num">05</span></div>
+        <div class="body">
+          <div class="name">Ember Warm</div>
+          <div class="hex">#FF7040</div>
+          <div class="role">Gradient end / warm accent</div>
+          <div class="where">Gradient endpoint<br/>Warm highlight<br/>Display-only</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:24px; margin-top:18px; flex-wrap:wrap; font-family: var(--mono); font-size: 11px; color: var(--fg-muted);">
+      <div><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#FFFFFF; border:1px solid var(--border); vertical-align:1px; margin-right:6px;"></span>Text on sunset &nbsp;·&nbsp; <b style="color:var(--fg)">#FFFFFF</b> &nbsp;·&nbsp; never dark ink</div>
+      <div><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:var(--sunset-tint); border:1px solid var(--border); vertical-align:1px; margin-right:6px;"></span>Primary tint &nbsp;·&nbsp; <b style="color:var(--fg)">rgba(232,48,90,0.08)</b></div>
+    </div>
+  </section>
+
+  <!-- 02 Agent Gradient -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02 / Agent</span>
+      <h2>Agent Gradient</h2>
+      <span class="rule"></span>
+    </div>
+    <p class="sec-note">One agent surface per screen. The gradient signals "the agent is here" and nothing else earns that signal.</p>
+
+    <div class="grad-row">
+      <div class="grad-main">
+        <div class="grad-band">
+          <div class="stop-chip">#FF4E7D &nbsp;·&nbsp; Sunset Vivid</div>
+          <div class="stop-chip">#FF7040 &nbsp;·&nbsp; Ember Warm</div>
+        </div>
+        <div class="grad-meta">
+          <div>
+            <div class="k">Direction</div>
+            <div class="v">135° (FAB) · 90° (bar)</div>
+          </div>
+          <div>
+            <div class="k">Shadow 1</div>
+            <div class="v">rgba(255,78,125, 0.30)</div>
+          </div>
+          <div>
+            <div class="k">Shadow 2</div>
+            <div class="v">rgba(255,112,64, 0.20)</div>
+          </div>
+        </div>
+      </div>
+      <div class="grad-side">
+        <h4>Permitted surfaces</h4>
+        <ul class="usage-list">
+          <li><span class="tag">FAB</span> Primary agent entry</li>
+          <li><span class="tag">AgentBubble</span> Top border, 3px</li>
+          <li><span class="tag">ProgressBar</span> Fill</li>
+          <li><span class="tag">Logo</span> On dark only</li>
+          <li><span class="tag">AgentAvatar</span> Background</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Neutrals -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03 / Neutrals</span>
+      <h2>Surfaces &amp; Text</h2>
+      <span class="rule"></span>
+    </div>
+
+    <div class="neutrals">
+      <div class="n-cell"><div class="chip" style="background:#FAF8F7"></div><div class="body"><div class="hex">#FAF8F7</div><div class="role">Page bg — warm paper</div></div></div>
+      <div class="n-cell"><div class="chip" style="background:#FFFDFC"></div><div class="body"><div class="hex">#FFFDFC</div><div class="role">Card surface — off-white</div></div></div>
+      <div class="n-cell"><div class="chip" style="background:#ECE8E6"></div><div class="body"><div class="hex">#ECE8E6</div><div class="role">Borders, input borders</div></div></div>
+      <div class="n-cell"><div class="chip" style="background:#B8B0AD"></div><div class="body"><div class="hex">#B8B0AD</div><div class="role">Tertiary text, hints</div></div></div>
+      <div class="n-cell"><div class="chip" style="background:#8A8380"></div><div class="body"><div class="hex">#8A8380</div><div class="role">Muted text</div></div></div>
+      <div class="n-cell"><div class="chip" style="background:#1A1614"></div><div class="body"><div class="hex" style="color:var(--fg)">#1A1614</div><div class="role">Primary text — warm near-black</div></div></div>
+    </div>
+  </section>
+
+  <!-- 04 Dark mode -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04 / Dark</span>
+      <h2>Dark Mode Shifts</h2>
+      <span class="rule"></span>
+    </div>
+    <p class="sec-note">Against Dusk surfaces the sunset scale shifts one stop brighter — deeper stops lose saturation on dark, so we step up. Tint opacity rises from 8% to 12%.</p>
+
+    <div class="dark-card">
+      <div class="dark-head">
+        <div class="title">Sunset scale · one stop brighter on Dusk</div>
+        <div class="sub">dusk_mode : on</div>
+      </div>
+      <div class="shift-grid">
+        <div class="shift">
+          <div class="label">Primary</div>
+          <div class="row"><div class="chip" style="background:#E8305A"></div><span>#E8305A</span><span class="arrow">→</span><div class="chip" style="background:#F03B65"></div><span>#F03B65</span></div>
+        </div>
+        <div class="shift">
+          <div class="label">Hover</div>
+          <div class="row"><div class="chip" style="background:#CC2848"></div><span>#CC2848</span><span class="arrow">→</span><div class="chip" style="background:#E8305A"></div><span>#E8305A</span></div>
+        </div>
+        <div class="shift">
+          <div class="label">Display</div>
+          <div class="row"><div class="chip" style="background:#F03B65"></div><span>#F03B65</span><span class="arrow">→</span><div class="chip" style="background:#FF4E7D"></div><span>#FF4E7D</span></div>
+        </div>
+        <div class="shift">
+          <div class="label">Primary tint</div>
+          <div class="row"><div class="chip" style="background:rgba(232,48,90,0.08); border:1px solid #2E2A31;"></div><span>8%</span><span class="arrow">→</span><div class="chip" style="background:rgba(240,59,101,0.12); border:1px solid #2E2A31;"></div><span>12%</span></div>
+        </div>
+      </div>
+
+      <div class="dark-surfaces">
+        <div style="background:#161214;">#161214 · Page</div>
+        <div style="background:#1F1B1D;">#1F1B1D · Card</div>
+        <div style="background:#262123;">#262123 · Elevated</div>
+        <div style="background:#2A2528;">#2A2528 · Border</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Semantic -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05 / Semantic</span>
+      <h2>Status &amp; State</h2>
+      <span class="rule"></span>
+    </div>
+    <p class="sec-note">Intentionally distinct from sunset. Brand signals "Housemate"; these signal "here's what happened." Error sits closest in hue — it's a desaturated oxide-red; primary is vivid magenta-red. Keep them on separate surfaces.</p>
+
+    <div class="sem-grid">
+      <div class="sem">
+        <div class="bar" style="background:#1A7F4B"></div>
+        <div class="body">
+          <div class="name"><span class="badge sb-success"><span class="d"></span>Success</span></div>
+          <div class="hex">#1A7F4B</div>
+          <div class="meaning">Complete · confirmed · paid · DAL connected</div>
+          <div class="where">StatusBadge.complete<br/>ConnectorCard dot</div>
+        </div>
+      </div>
+      <div class="sem">
+        <div class="bar" style="background:#1A5FAF"></div>
+        <div class="body">
+          <div class="name"><span class="badge sb-info"><span class="d"></span>Info</span></div>
+          <div class="hex">#1A5FAF</div>
+          <div class="meaning">Active · scheduled · in progress</div>
+          <div class="where">StatusBadge.active<br/>ConnectorCard bank bg</div>
+        </div>
+      </div>
+      <div class="sem">
+        <div class="bar" style="background:#9A6200"></div>
+        <div class="body">
+          <div class="name"><span class="badge sb-warning"><span class="d"></span>Warning</span></div>
+          <div class="hex">#9A6200</div>
+          <div class="meaning">Overdue · due soon · needs attention</div>
+          <div class="where">NeedsAttentionBanner<br/>InboxItem urgent</div>
+        </div>
+      </div>
+      <div class="sem">
+        <div class="bar" style="background:#C0392B"></div>
+        <div class="body">
+          <div class="name"><span class="badge sb-error"><span class="d"></span>Error</span></div>
+          <div class="hex">#C0392B</div>
+          <div class="meaning">Failed · blocked · revoked</div>
+          <div class="where">StatusBadge.error<br/>PermissionToggle</div>
+        </div>
+      </div>
+      <div class="sem">
+        <div class="bar" style="background:#6B46C1"></div>
+        <div class="body">
+          <div class="name"><span class="badge sb-violet"><span class="d"></span>Violet</span></div>
+          <div class="hex">#6B46C1</div>
+          <div class="meaning">Agent working · AI processing · paused</div>
+          <div class="where">StatusBadge.paused</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Applied UI -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06 / Applied</span>
+      <h2>Roles in context</h2>
+      <span class="rule"></span>
+    </div>
+    <p class="sec-note">The scale only earns its keep when each stop shows up on the right surface. Here's each one doing its job.</p>
+
+    <div class="applied">
+      <!-- Buttons -->
+      <div class="card" style="grid-column: span 6;">
+        <div class="card-label">Primary · Hover · Pressed</div>
+        <h4>Buttons</h4>
+        <div class="btn-row" style="margin-top: 12px;">
+          <button class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            Continue
+          </button>
+          <button class="btn btn-primary" style="background: var(--sunset-hover)">Hover state</button>
+          <button class="btn btn-primary" style="background: var(--sunset-warm)">Pressed</button>
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-destructive">Delete</button>
+        </div>
+        <div style="margin-top: 18px;" class="card-label">Focus ring · Sunset Subtle</div>
+        <input class="input" placeholder="Click to focus — ring uses #F03B65" style="margin-top: 4px;"/>
+      </div>
+
+      <!-- FAB + Agent -->
+      <div class="card" style="grid-column: span 6;">
+        <div class="card-label">Agent gradient · one per screen</div>
+        <h4>Agent surfaces</h4>
+        <div style="display:flex; gap:20px; align-items:center; margin-top:14px;">
+          <div class="fab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.2 5.4L20 9l-4.2 4 1.2 6-5-2.8L7 19l1.2-6L4 9l5.8-1.6z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div class="agent-bubble">
+              <div class="top"></div>
+              <div class="body">I pulled your Oakview renewal packet together and flagged two clauses your tenant marked up. Want me to draft a counter?</div>
+              <div class="meta">
+                <div class="agent-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M8 12l3 3 5-7"/></svg></div>
+                <span>Housemate · 0.8s ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 18px;" class="card-label">ProgressBar · 90° gradient</div>
+        <div class="pb" style="margin-top:8px;"><i></i></div>
+      </div>
+
+      <!-- Status badges -->
+      <div class="card" style="grid-column: span 6;">
+        <div class="card-label">Semantic · never sunset</div>
+        <h4>Status badges</h4>
+        <div class="btn-row" style="margin-top:12px;">
+          <span class="sb sb-success"><span class="d"></span>Complete</span>
+          <span class="sb sb-success"><span class="d"></span>DAL active</span>
+          <span class="sb sb-info"><span class="d"></span>Scheduled</span>
+          <span class="sb sb-warning"><span class="d"></span>Due Apr 22</span>
+          <span class="sb sb-warning"><span class="d"></span>Needs attention</span>
+          <span class="sb sb-error"><span class="d"></span>Revoked</span>
+          <span class="sb sb-error"><span class="d"></span>Failed</span>
+          <span class="sb sb-violet"><span class="d"></span>Paused</span>
+          <span class="sb sb-violet"><span class="d"></span>Agent working</span>
+        </div>
+      </div>
+
+      <!-- Nav pill -->
+      <div class="card" style="grid-column: span 6;">
+        <div class="card-label">Active nav · Primary tint pill</div>
+        <h4>Navigation</h4>
+        <div style="margin-top:12px;">
+          <div class="nav">
+            <div class="nav-item">Inbox</div>
+            <div class="nav-item active">Properties</div>
+            <div class="nav-item">Connectors</div>
+            <div class="nav-item">Activity</div>
+            <div class="nav-item">Settings</div>
+          </div>
+        </div>
+        <div style="margin-top: 18px;" class="card-label">Inbox unread · True Primary dot</div>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border); border-radius:10px;">
+            <span style="width:8px; height:8px; border-radius:999px; background:var(--sunset-primary)"></span>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:600;">Lease renewal — 431 Oakview</div>
+              <div style="font-size:11px; color:var(--fg-muted); font-family: var(--mono);">Tenant responded · 2m</div>
+            </div>
+            <span class="sb sb-warning"><span class="d"></span>Due soon</span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--border); border-radius:10px; opacity:0.7;">
+            <span style="width:8px; height:8px;"></span>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:500;">Utility connector synced</div>
+              <div style="font-size:11px; color:var(--fg-muted); font-family: var(--mono);">ConEd · yesterday</div>
+            </div>
+            <span class="sb sb-success"><span class="d"></span>Complete</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset card -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-label">Waterfall position · True Primary</div>
+        <h4>Property asset</h4>
+        <div class="asset" style="margin-top:12px;">
+          <div class="cover"><div class="mono">property_shot.jpg</div></div>
+          <div class="meta">
+            <div class="title">431 Oakview Ave</div>
+            <div class="sub">Brooklyn · 3BR · $4,200/mo</div>
+            <div class="chips">
+              <span class="waterfall-pos">· Priority 01 ·</span>
+              <span class="agent-chip"><span class="d"></span>Agent: renewal drafted</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connector -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-label">ConnectorCard · semantic dot</div>
+        <h4>Connectors</h4>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(26,95,175,0.08); color:var(--info); display:grid; place-items:center; font-family:var(--mono); font-size:12px; font-weight:600;">CH</div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600;">Chase Business</div>
+              <div style="font-size:10px; color:var(--fg-muted); font-family: var(--mono);">Synced 2m ago</div>
+            </div>
+            <span style="width:8px; height:8px; border-radius:999px; background:var(--success);"></span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid rgba(154,98,0,0.3); border-radius:10px; background:rgba(154,98,0,0.04);">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(154,98,0,0.08); color:var(--warning); display:grid; place-items:center; font-family:var(--mono); font-size:12px; font-weight:600;">CE</div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600;">ConEd Utilities</div>
+              <div style="font-size:10px; color:var(--warning); font-family: var(--mono);">Auth expires in 3d</div>
+            </div>
+            <span style="width:8px; height:8px; border-radius:999px; background:var(--warning);"></span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid rgba(192,57,43,0.3); border-radius:10px;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(192,57,43,0.08); color:var(--error); display:grid; place-items:center; font-family:var(--mono); font-size:12px; font-weight:600;">PL</div>
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600;">Plaid</div>
+              <div style="font-size:10px; color:var(--error); font-family: var(--mono);">Revoked · reconnect</div>
+            </div>
+            <span style="width:8px; height:8px; border-radius:999px; background:var(--error);"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contrast -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-label">On-sunset text · WCAG AA</div>
+        <h4>Contrast</h4>
+        <div class="contrast" style="margin-top:12px;">
+          <div class="row h">
+            <div class="cell">Stop</div>
+            <div class="cell">vs #FFFFFF</div>
+            <div class="cell">vs #2A0A12</div>
+            <div class="cell">AA</div>
+            <div class="cell">Notes</div>
+          </div>
+          <div class="row">
+            <div class="cell"><div class="swatch-sm" style="background:#FF4E7D"></div>Vivid</div>
+            <div class="cell fail">3.3</div>
+            <div class="cell pass">6.3</div>
+            <div class="cell fail">—</div>
+            <div class="cell">Display</div>
+          </div>
+          <div class="row">
+            <div class="cell"><div class="swatch-sm" style="background:#E8305A"></div>Primary</div>
+            <div class="cell pass">4.6</div>
+            <div class="cell pass">4.5</div>
+            <div class="cell pass">✓</div>
+            <div class="cell">Button</div>
+          </div>
+          <div class="row">
+            <div class="cell"><div class="swatch-sm" style="background:#CC2848"></div>Hover</div>
+            <div class="cell pass">5.9</div>
+            <div class="cell pass">3.5</div>
+            <div class="cell pass">✓</div>
+            <div class="cell">Button</div>
+          </div>
+          <div class="row">
+            <div class="cell"><div class="swatch-sm" style="background:#FF7040"></div>Warm</div>
+            <div class="cell fail">2.8</div>
+            <div class="cell pass">7.5</div>
+            <div class="cell fail">—</div>
+            <div class="cell">Display</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; font-family:var(--mono); font-size:10px; color:var(--fg-muted); line-height:1.6;">
+          Text on sunset = <b style="color:var(--fg)">#FFFFFF</b>. White passes AA only on <b style="color:var(--fg)">#E8305A</b> and <b style="color:var(--fg)">#CC2848</b> — the button stops. Vivid and Warm are display-only on purpose.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="doc-foot">
+    <div>HOUSEMATE · DESIGN SYSTEM · COLOR</div>
+    <div>5 stops · 1 gradient · 6 neutrals · 5 semantic</div>
+  </footer>
+
+</div>
+
+<!-- Tweaks panel -->
+<aside class="tweaks" id="tweaks">
+  <div class="head">
+    <div class="t"><span class="d"></span>Tweaks</div>
+    <div style="font-family: var(--mono); font-size: 10px; color: var(--fg-tertiary);">live</div>
+  </div>
+
+  <div class="group">
+    <label class="k">Hue shift <span class="v" id="hueVal">0°</span></label>
+    <input type="range" id="hue" min="-180" max="180" step="1" value="0" />
+  </div>
+
+  <div class="group">
+    <label class="k">Chroma <span class="v" id="chromaVal">1.00×</span></label>
+    <input type="range" id="chroma" min="0.3" max="1.6" step="0.01" value="1" />
+  </div>
+
+  <div class="group">
+    <label class="k">Palette preset</label>
+    <div class="preset-row" id="presets"></div>
+  </div>
+
+  <div class="group">
+    <label class="k">Current stops</label>
+    <div id="stopList"></div>
+  </div>
+
+  <div class="group" style="display:flex; gap:6px;">
+    <button class="btn-tweak" id="swapGrad" style="flex:1;">Swap gradient</button>
+    <button class="btn-tweak" id="reset" style="flex:1;">Reset</button>
+  </div>
+
+  <div class="tweaks-info">
+    Hue rotation keeps the 5-stop role logic intact — lightness and chroma stay fixed, only the base hue slides.
+  </div>
+</aside>
+
+<script>
+/* ------------------------------------------------------------ *
+ *  TWEAKS — hue rotate the 5-stop sunset scale in oklch space  *
+ * ------------------------------------------------------------ */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "hueDelta": 0,
+  "chromaMult": 1,
+  "gradientSwapped": false,
+  "preset": "sunset"
+}/*EDITMODE-END*/;
+
+/* Base palette in oklch — derived from the sunset spec hex values */
+const BASE = {
+  vivid:   { L: 0.67, C: 0.22, H: 16 },   // #FF4E7D
+  subtle:  { L: 0.60, C: 0.21, H: 14 },   // #F03B65
+  primary: { L: 0.55, C: 0.20, H: 12 },   // #E8305A
+  hover:   { L: 0.48, C: 0.18, H: 10 },   // #CC2848
+  warm:    { L: 0.72, C: 0.18, H: 42 }    // #FF7040 (cross-hue: this is what gives sunset its punch)
+};
+/* Text on brand stays white — sunset is a "white text" palette by spec. */
+const TEXT_ON = { L: 1.0, C: 0.0, H: 0 };
+
+const PRESETS = {
+  sunset: { hueDelta:    0, label: 'Sunset', hex: '#E8305A' },
+  mint:   { hueDelta:  154, label: 'Mint',   hex: '#1FBF9A' },
+  ocean:  { hueDelta:  210, label: 'Ocean',  hex: '#1F8FBF' },
+  violet: { hueDelta:  280, label: 'Violet', hex: '#6B46C1' },
+  amber:  { hueDelta:   35, label: 'Amber',  hex: '#BF8F1F' }
+};
+
+/* Minimal oklch → sRGB. Based on Björn Ottosson. */
+function oklchToRgb(L, C, H) {
+  const hRad = (H * Math.PI) / 180;
+  const a = Math.cos(hRad) * C;
+  const b = Math.sin(hRad) * C;
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+  const l = l_ ** 3, m = m_ ** 3, s = s_ ** 3;
+  let r =  4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  let bl = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+  const toSrgb = x => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    return x <= 0.0031308 ? 12.92 * x : 1.055 * (x ** (1/2.4)) - 0.055;
+  };
+  return [toSrgb(r), toSrgb(g), toSrgb(bl)].map(v => Math.round(v * 255));
+}
+function toHex([r,g,b]) {
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+const state = { ...TWEAK_DEFAULTS };
+
+function computeStop(stop) {
+  return oklchToRgb(stop.L, stop.C * state.chromaMult, stop.H + state.hueDelta);
+}
+function computeTextOn() {
+  // Text stays in same hue family; shift with it so it reads natural.
+  return oklchToRgb(TEXT_ON.L, TEXT_ON.C, TEXT_ON.H + state.hueDelta);
+}
+
+function apply() {
+  const root = document.documentElement.style;
+  const vivid   = computeStop(BASE.vivid);
+  const subtle  = computeStop(BASE.subtle);
+  const primary = computeStop(BASE.primary);
+  const hover   = computeStop(BASE.hover);
+  const warm    = computeStop(BASE.warm);
+  const onSunset = computeTextOn();
+
+  root.setProperty('--sunset-vivid',   toHex(vivid));
+  root.setProperty('--sunset-subtle',  toHex(subtle));
+  root.setProperty('--sunset-primary', toHex(primary));
+  root.setProperty('--sunset-hover',   toHex(hover));
+  root.setProperty('--sunset-warm',    toHex(warm));
+  root.setProperty('--on-sunset',      toHex(onSunset));
+
+  root.setProperty('--sunset-tint', `rgba(${primary.join(',')}, 0.08)`);
+
+  const from = state.gradientSwapped ? warm : vivid;
+  const to   = state.gradientSwapped ? vivid : warm;
+  root.setProperty('--agent-from', toHex(from));
+  root.setProperty('--agent-to',   toHex(to));
+  root.setProperty('--agent-glow1', `rgba(${from.join(',')}, 0.30)`);
+  root.setProperty('--agent-glow2', `rgba(${to.join(',')}, 0.20)`);
+
+  // Update stop list
+  const list = document.getElementById('stopList');
+  if (list) {
+    const stops = [
+      ['Vivid', vivid], ['Subtle', subtle], ['Primary', primary],
+      ['Hover', hover], ['Warm', warm]
+    ];
+    list.innerHTML = stops.map(([n, rgb]) => `
+      <div class="mini-row">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span class="sw" style="background: ${toHex(rgb)}"></span>${n}
+        </span>
+        <span>${toHex(rgb)}</span>
+      </div>`).join('');
+  }
+
+  // Update labels
+  document.getElementById('hueVal').textContent = (state.hueDelta >= 0 ? '+' : '') + state.hueDelta + '°';
+  document.getElementById('chromaVal').textContent = state.chromaMult.toFixed(2) + '×';
+
+  // Determine active preset
+  const active = Object.entries(PRESETS).find(([, p]) => p.hueDelta === state.hueDelta)?.[0];
+  document.querySelectorAll('.preset').forEach(el => {
+    el.classList.toggle('active', el.dataset.preset === active);
+  });
+
+  persist();
+}
+
+function persist() {
+  try {
+    window.parent.postMessage({
+      type: '__edit_mode_set_keys',
+      edits: {
+        hueDelta: state.hueDelta,
+        chromaMult: state.chromaMult,
+        gradientSwapped: state.gradientSwapped,
+        preset: Object.entries(PRESETS).find(([,p]) => p.hueDelta === state.hueDelta)?.[0] || 'custom'
+      }
+    }, '*');
+  } catch(e) {}
+}
+
+/* Wire up controls */
+function initTweaks() {
+  const hue = document.getElementById('hue');
+  const chroma = document.getElementById('chroma');
+  const swap = document.getElementById('swapGrad');
+  const reset = document.getElementById('reset');
+  const presetsEl = document.getElementById('presets');
+
+  // Build presets
+  presetsEl.innerHTML = Object.entries(PRESETS).map(([key, p]) => `
+    <div class="preset" data-preset="${key}" title="${p.label}"
+         style="background: ${p.hex}"></div>
+  `).join('');
+
+  presetsEl.addEventListener('click', (e) => {
+    const el = e.target.closest('.preset');
+    if (!el) return;
+    const preset = PRESETS[el.dataset.preset];
+    state.hueDelta = preset.hueDelta;
+    hue.value = preset.hueDelta;
+    apply();
+  });
+
+  hue.addEventListener('input', () => { state.hueDelta = +hue.value; apply(); });
+  chroma.addEventListener('input', () => { state.chromaMult = +chroma.value; apply(); });
+  swap.addEventListener('click', () => { state.gradientSwapped = !state.gradientSwapped; apply(); });
+  reset.addEventListener('click', () => {
+    state.hueDelta = 0; state.chromaMult = 1; state.gradientSwapped = false;
+    hue.value = 0; chroma.value = 1;
+    apply();
+  });
+
+  // Restore
+  hue.value = state.hueDelta;
+  chroma.value = state.chromaMult;
+  apply();
+}
+
+/* Edit-mode handshake — register listener BEFORE announcing */
+window.addEventListener('message', (e) => {
+  const d = e.data || {};
+  if (d.type === '__activate_edit_mode') {
+    document.getElementById('tweaks').classList.add('open');
+  } else if (d.type === '__deactivate_edit_mode') {
+    document.getElementById('tweaks').classList.remove('open');
+  }
+});
+try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch(e) {}
+
+initTweaks();
+</script>
+</body>
+</html>
